@@ -41,9 +41,7 @@ pending_users_collection = db["pending_users"]
 
 
 def send_otp_email(email, otp):
-
     try:
-
         msg = Message(
             subject="NoteHub OTP Verification",
             sender=os.getenv("MAIL_USERNAME"),
@@ -63,9 +61,7 @@ Do not share this code with anyone.
         print("EMAIL SENT SUCCESSFULLY")
 
     except Exception as e:
-
         print("EMAIL ERROR:", str(e))
-        raise
 
 
 def token_required(f):
@@ -143,7 +139,7 @@ def signup():
         "otp": otp
     })
 
-    print("OTP =", otp)
+    send_otp_email(email, otp)
 
     return jsonify({
         "message": "OTP Sent Successfully"
