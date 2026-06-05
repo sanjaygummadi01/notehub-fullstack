@@ -41,27 +41,21 @@ pending_users_collection = db["pending_users"]
 
 
 def send_otp_email(email, otp):
-    try:
-        msg = Message(
-            subject="NoteHub OTP Verification",
-            sender=os.getenv("MAIL_USERNAME"),
-            recipients=[email]
-        )
+    print("START EMAIL")
 
-        msg.body = f"""
-Your NoteHub verification code is:
+    msg = Message(
+        subject="NoteHub OTP Verification",
+        sender=os.getenv("MAIL_USERNAME"),
+        recipients=[email]
+    )
 
-{otp}
+    msg.body = f"Your OTP is {otp}"
 
-Do not share this code with anyone.
-"""
+    print("BEFORE SEND")
 
-        mail.send(msg)
+    mail.send(msg)
 
-        print("EMAIL SENT SUCCESSFULLY")
-
-    except Exception as e:
-        print("EMAIL ERROR:", str(e))
+    print("AFTER SEND")
 
 
 def token_required(f):
