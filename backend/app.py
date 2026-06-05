@@ -7,25 +7,27 @@ import jwt
 from functools import wraps
 from datetime import datetime, timedelta
 from flask_mail import Mail, Message
-from config import *
+from dotenv import load_dotenv
+import os
 import random
 
+load_dotenv()
 app = Flask(__name__)
 
-app.config["MAIL_SERVER"] = MAIL_SERVER
-app.config["MAIL_PORT"] = MAIL_PORT
-app.config["MAIL_USE_TLS"] = MAIL_USE_TLS
-app.config["MAIL_USERNAME"] = MAIL_USERNAME
-app.config["MAIL_PASSWORD"] = MAIL_PASSWORD
+app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER")
+app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT"))
+app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS") == "True"
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
 
 mail = Mail(app)
 
 CORS(app)
 
-SECRET_KEY = "notehub_secret_key"
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 client = MongoClient(
-    "mongodb+srv://notehubadmin:Gummadi123@cluster0.zrvbssd.mongodb.net/?appName=Cluster0"
+    os.getenv("MONGO_URI")
 )
 
 db = client["notehub"]
@@ -39,7 +41,7 @@ def send_otp_email(email, otp):
 
     msg = Message(
         subject="NoteHub OTP Verification",
-        sender=MAIL_USERNAME,
+        sender=os.getenv("MAIL_USERNAME"),
         recipients=[email]
     )
 
