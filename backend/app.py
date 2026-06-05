@@ -20,6 +20,7 @@ app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS") == "True"
 app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
 app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
 app.config["MAIL_DEBUG"] = True
+app.config["MAIL_SUPPRESS_SEND"] = False
 mail = Mail(app)
 
 CORS(app)
@@ -41,7 +42,6 @@ pending_users_collection = db["pending_users"]
 
 
 def send_otp_email(email, otp):
-
     print("START EMAIL")
 
     try:
@@ -63,10 +63,13 @@ Do not share this code with anyone.
 
         mail.send(msg)
 
-        print("EMAIL SENT")
+        print("EMAIL SENT SUCCESSFULLY")
+
+        return True
 
     except Exception as e:
         print("EMAIL ERROR:", str(e))
+        return False
 
 def token_required(f):
 
@@ -143,7 +146,13 @@ def signup():
         "otp": otp
     })
 
-    send_otp_email(email, otp)
+    email_sent = send_otp_email(email, otp)
+
+    if not email_sent:
+        return jsonify({
+            "message": "Email sending failed"
+        }), 500
+
 
     return jsonify({
         "message": "OTP Sent Successfully"
