@@ -134,7 +134,7 @@ def signup():
         "otp": otp
     })
 
-    send_otp_email(email, otp)
+    # send_otp_email(email, otp)
 
     return jsonify({
         "message": "OTP Sent Successfully"
