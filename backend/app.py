@@ -27,8 +27,11 @@ CORS(app)
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 client = MongoClient(
-    os.getenv("MONGO_URI")
+    os.getenv("MONGO_URI"),
+    serverSelectionTimeoutMS=5000
 )
+
+client.server_info()
 
 db = client["notehub"]
 
