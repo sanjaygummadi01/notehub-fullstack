@@ -19,7 +19,7 @@ app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT"))
 app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS") == "True"
 app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
 app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
-
+app.config["MAIL_DEBUG"] = True
 mail = Mail(app)
 
 CORS(app)
@@ -41,22 +41,32 @@ pending_users_collection = db["pending_users"]
 
 
 def send_otp_email(email, otp):
+
     print("START EMAIL")
 
-    msg = Message(
-        subject="NoteHub OTP Verification",
-        sender=os.getenv("MAIL_USERNAME"),
-        recipients=[email]
-    )
+    try:
+        msg = Message(
+            subject="NoteHub OTP Verification",
+            sender=os.getenv("MAIL_USERNAME"),
+            recipients=[email]
+        )
 
-    msg.body = f"Your OTP is {otp}"
+        msg.body = f"""
+Your NoteHub verification code is:
 
-    print("BEFORE SEND")
+{otp}
 
-    mail.send(msg)
+Do not share this code with anyone.
+"""
 
-    print("AFTER SEND")
+        print("BEFORE SEND")
 
+        mail.send(msg)
+
+        print("EMAIL SENT")
+
+    except Exception as e:
+        print("EMAIL ERROR:", str(e))
 
 def token_required(f):
 
