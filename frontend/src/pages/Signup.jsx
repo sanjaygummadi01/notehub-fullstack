@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-
+import "../styles/Signup.css";
 function Signup() {
 
   const navigate = useNavigate();
@@ -25,14 +25,9 @@ function Signup() {
         }
       );
 
-      localStorage.setItem(
-        "verify_email",
-        email
-      );
-
       alert(response.data.message);
 
-      navigate("/verify-otp");
+      navigate("/");
 
     } catch (error) {
 
@@ -44,24 +39,10 @@ function Signup() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#0a0a0a",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <div
-        style={{
-          width: "400px",
-          background: "#111111",
-          padding: "30px",
-          borderRadius: "12px",
-          color: "white",
-        }}
-      >
+    <div className="auth-page">
+
+      <div className="auth-card">
+
         <h1>NoteHub</h1>
 
         <h2>Create Account</h2>
@@ -72,34 +53,22 @@ function Signup() {
             type="text"
             placeholder="Full Name"
             value={name}
-            onChange={(e) =>
-              setName(e.target.value)
-            }
+            onChange={(e)=>setName(e.target.value)}
           />
-
-          <br /><br />
 
           <input
             type="email"
             placeholder="Email"
             value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
+            onChange={(e)=>setEmail(e.target.value)}
           />
-
-          <br /><br />
 
           <input
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
+            onChange={(e)=>setPassword(e.target.value)}
           />
-
-          <br /><br />
 
           <button type="submit">
             Create Account
@@ -115,6 +84,7 @@ function Signup() {
         </p>
 
       </div>
+
     </div>
   );
 }

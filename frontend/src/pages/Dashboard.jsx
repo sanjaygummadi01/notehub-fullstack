@@ -24,6 +24,7 @@ function Dashboard() {
   const [title, setTitle] = useState("");
 
   const [content, setContent] = useState("");
+  const [showModal,setShowModal] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -100,37 +101,11 @@ function Dashboard() {
 
           <h1>My Notes</h1>
 
-          <form
-            onSubmit={createNote}
-            style={{ marginBottom: "30px" }}
-          >
-            <input
-              type="text"
-              placeholder="Title"
-              value={title}
-              onChange={(e) =>
-                setTitle(e.target.value)
-              }
-            />
-
-            <br />
-            <br />
-
-            <textarea
-              placeholder="Content"
-              value={content}
-              onChange={(e) =>
-                setContent(e.target.value)
-              }
-            />
-
-            <br />
-            <br />
-
-            <button type="submit">
-              Save Note
-            </button>
-          </form>
+          <button
+            className="add-note-btn"
+                    onClick={() => setShowModal(true)}>
+                + Add New Note
+                    </button>
 
           <div className="notes-grid">
 
@@ -143,6 +118,52 @@ function Dashboard() {
             ))}
 
           </div>
+
+        {showModal && (
+
+        <div className="modal-overlay">
+
+          <div className="modal">
+
+            <h2>Create New Note</h2>
+
+            <input
+              type="text"
+              placeholder="Note Title"
+              value={title}
+              onChange={(e)=>setTitle(e.target.value)}
+            />
+
+            <textarea
+              placeholder="Write your note..."
+              value={content}
+              onChange={(e)=>setContent(e.target.value)}
+            />
+
+            <div className="modal-actions">
+
+              <button
+                onClick={() => setShowModal(false)}
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={(e)=>{
+                  createNote(e);
+                  setShowModal(false);
+                }}
+              >
+                Save Note
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        )}
 
         </div>
 

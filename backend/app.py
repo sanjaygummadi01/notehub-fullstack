@@ -6,22 +6,14 @@ import bcrypt
 import jwt
 from functools import wraps
 from datetime import datetime, timedelta
-from flask_mail import Mail, Message
 from dotenv import load_dotenv
 import os
-import random
 
 load_dotenv()
 app = Flask(__name__)
-
-app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER")
-app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT"))
-app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS") == "True"
-app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
-app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
 app.config["MAIL_DEBUG"] = True
 app.config["MAIL_SUPPRESS_SEND"] = False
-mail = Mail(app)
+
 
 CORS(app)
 
@@ -39,37 +31,6 @@ db = client["notehub"]
 users_collection = db["users"]
 notes_collection = db["notes"]
 pending_users_collection = db["pending_users"]
-
-
-def send_otp_email(email, otp):
-    print("START EMAIL")
-
-    try:
-        msg = Message(
-            subject="NoteHub OTP Verification",
-            sender=os.getenv("MAIL_USERNAME"),
-            recipients=[email]
-        )
-
-        msg.body = f"""
-Your NoteHub verification code is:
-
-{otp}
-
-Do not share this code with anyone.
-"""
-
-        print("BEFORE SEND")
-
-        mail.send(msg)
-
-        print("EMAIL SENT SUCCESSFULLY")
-
-        return True
-
-    except Exception as e:
-        print("EMAIL ERROR:", str(e))
-        return False
 
 def token_required(f):
 
@@ -128,72 +89,20 @@ def signup():
             "message": "User already exists"
         }), 400
 
-    otp = str(random.randint(100000, 999999))
-
     hashed_password = bcrypt.hashpw(
         password.encode("utf-8"),
         bcrypt.gensalt()
     )
 
-    pending_users_collection.delete_many({
-        "email": email
-    })
-
-    pending_users_collection.insert_one({
+    users_collection.insert_one({
         "name": name,
         "email": email,
-        "password": hashed_password,
-        "otp": otp
-    })
-
-    email_sent = send_otp_email(email, otp)
-
-    if not email_sent:
-        return jsonify({
-            "message": "Email sending failed"
-        }), 500
-
-
-    return jsonify({
-        "message": "OTP Sent Successfully"
-    })
-
-
-@app.route("/verify-otp", methods=["POST"])
-def verify_otp():
-
-    data = request.json
-
-    email = data.get("email")
-    otp = data.get("otp")
-
-    pending_user = pending_users_collection.find_one({
-        "email": email
-    })
-
-    if not pending_user:
-        return jsonify({
-            "message": "User Not Found"
-        }), 404
-
-    if pending_user["otp"] != otp:
-        return jsonify({
-            "message": "Invalid OTP"
-        }), 400
-
-    users_collection.insert_one({
-        "name": pending_user["name"],
-        "email": pending_user["email"],
-        "password": pending_user["password"]
-    })
-
-    pending_users_collection.delete_one({
-        "_id": pending_user["_id"]
+        "password": hashed_password
     })
 
     return jsonify({
-        "message": "Account Verified Successfully"
-    })
+        "message": "Account Created Successfully"
+    }), 201
 
 
 @app.route("/login", methods=["POST"])
